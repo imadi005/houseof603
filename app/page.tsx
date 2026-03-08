@@ -843,6 +843,7 @@ export default function Home() {
           {/* ========== TOP EMAIL FORM ONLY ========== */}
           <div className="w-full max-w-md mb-3">
             <PortalForm
+              type="email"
               position="top"
               value={topEmail}
               onChange={setTopEmail}
@@ -1215,6 +1216,7 @@ export default function Home() {
           {/* ========== BOTTOM EMAIL FORM ONLY ========== */}
           <div className="w-full max-w-md">
             <PortalForm
+              type="email" 
               position="bottom"
               value={bottomEmail}
               onChange={setBottomEmail}
