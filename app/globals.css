@@ -24,3 +24,9 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+:root {
+  --cream: #FFF7EC;
+  --portal-purple: #7A3CFF;
+  --portal-lime: #A8FF2E;
+}
