@@ -6,9 +6,9 @@ import Image from "next/image";
 import { PortalForm } from "./PortalForm";
 
 export default function Home() {
-  const [isHoveringPortal, setIsHoveringPortal] = useState(false);
-  const [isHoveringLogo, setIsHoveringLogo] = useState(false);
-  const [isHoveringEnter, setIsHoveringEnter] = useState(false);
+  const [isTouchingPortal, setIsTouchingPortal] = useState(false);
+  const [isTouchingLogo, setIsTouchingLogo] = useState(false);
+  const [isTouchingEnter, setIsTouchingEnter] = useState(false);
   const [glitchText, setGlitchText] = useState("");
   
   // Email States Only
@@ -17,26 +17,48 @@ export default function Home() {
   
   const [portalPower, setPortalPower] = useState(0);
   const [logoGlitch, setLogoGlitch] = useState(false);
-  const [gameActive, setGameActive] = useState(false);
-  const [gameScore, setGameScore] = useState(0);
-  const [gameMessage, setGameMessage] = useState("");
+  const [catchGameActive, setCatchGameActive] = useState(false);
+  const [catchScore, setCatchScore] = useState(0);
+  const [catchMessage, setCatchMessage] = useState("");
   const [logoPosition, setLogoPosition] = useState({ x: 0, y: 0 });
   const [sassyMessage, setSassyMessage] = useState("");
   const [showSassy, setShowSassy] = useState(false);
   const [cursorMessage, setCursorMessage] = useState("");
   const [showCursorMessage, setShowCursorMessage] = useState(false);
-  const [fakeCounter, setFakeCounter] = useState(4382);
+  const [viewerCount, setViewerCount] = useState(4382);
   const [systemLogs, setSystemLogs] = useState<string[]>([]);
   const [portalOrbitText, setPortalOrbitText] = useState("ENTER IF YOU DARE");
   const [konami, setKonami] = useState<string[]>([]);
-  const [portalClicks, setPortalClicks] = useState(0);
-  const [showEasterEgg, setShowEasterEgg] = useState(false);
+  const [portalTaps, setPortalTaps] = useState(0);
+  const [showSecret, setShowSecret] = useState(false);
   const [floatingObjects, setFloatingObjects] = useState<any[]>([]);
+  
+  // ========== CRAZY COUNTER - NO REAL DATE ==========
+  const [crazyCounter, setCrazyCounter] = useState({
+    days: '88',
+    hours: '88',
+    minutes: '88',
+    seconds: '88'
+  });
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCrazyCounter({
+        days: Math.floor(Math.random() * 90 + 10).toString().padStart(2, '0'),
+        hours: Math.floor(Math.random() * 24).toString().padStart(2, '0'),
+        minutes: Math.floor(Math.random() * 60).toString().padStart(2, '0'),
+        seconds: Math.floor(Math.random() * 60).toString().padStart(2, '0'),
+      });
+    }, 1000);
+    
+    return () => clearInterval(interval);
+  }, []);
+  
   const gameRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
   
-  // Mouse follower
+  // Mouse follower (desktop only)
   const cursorX = useMotionValue(-100);
   const cursorY = useMotionValue(-100);
   
@@ -44,27 +66,27 @@ export default function Home() {
   const cursorXSpring = useSpring(cursorX, springConfig);
   const cursorYSpring = useSpring(cursorY, springConfig);
 
-  // SASSY POPUPS ARRAY
-  const sassyPopups = [
-    "someone from delhi just joined the portal 👀",
-    "bro someone from mumbai just signed up 💀",
-    "portal energy increasing ⚡",
-    "new weird drop loading...",
-    "someone just entered the void",
-    "your neighbor is also waiting",
-    "bengaluru girl just joined",
-    "bro this is getting weird",
-    "you're early. good.",
-    "some things shouldn't exist.",
-    "momos hair clip restocking...",
-    "water rocket in the wild 💦",
+  // MYSTERIOUS POPUPS - Changed vibe from gaming to mysterious
+  const mysteriousPopups = [
+    "someone just discovered a secret gift 🎁",
+    "a mysterious package is being prepared...",
+    "bengaluru just entered the portal ✨",
+    "new curated drop loading...",
+    "someone unlocked a surprise 🎀",
+    "your neighbor just joined the waitlist",
+    "mumbai is watching 👀",
+    "the internet is getting weirder...",
+    "you're early. good things are coming.",
+    "some things aren't meant to exist.",
+    "bubble cigarettes restocking...",
+    "water rocket spotted in the wild 💦",
   ];
 
   // SYSTEM LOGS ARRAY
   const logMessages = [
-    "[portal] scanning internet...",
-    "[portal] weird objects found",
-    "[portal] preparing drop",
+    "[portal] scanning the internet...",
+    "[portal] curating weird finds",
+    "[portal] preparing gift drops",
     "[portal] opening soon",
     "[system] anomaly detected",
     "[portal] bubble cigarettes located",
@@ -74,30 +96,30 @@ export default function Home() {
     "[portal] 603 energy rising",
   ];
 
-  // PORTAL ORBIT TEXTS
+  // PORTAL ORBIT TEXTS - More mysterious/gift focused
   const orbitTexts = [
-    "DO NOT ENTER",
-    "ENTER ANYWAY",
-    "THIS IS WEIRD",
+    "DISCOVER THE WEIRD",
+    "GIFTS FROM THE VOID",
+    "THIS IS MYSTERIOUS",
     "PORTAL ACTIVE",
     "603% WEIRDER",
     "YOU SURE?",
-    "TOO LATE",
-    "GO BACK",
-    "NO REFUNDS",
+    "TOO LATE TO LEAVE",
     "ENTER THE VOID",
+    "NO REFUNDS",
+    "CURATED CHAOS",
   ];
 
-  // WEIRD OBJECTS
+  // WEIRD GIFT OBJECTS
   const weirdObjects = [
-    { emoji: '🚬', name: 'Bubble Cigarette' },
-    { emoji: '💦', name: 'Water Rocket' },
-    { emoji: '✏️', name: 'Tansformer Pen' },
-    { emoji: '🐱', name: 'Angry Cat Lamp' },
-    { emoji: '🍔', name: 'Burger Slippers' },
-    { emoji: '🧦', name: 'Mismatch Socks' },
-    { emoji: '🎲', name: 'Chaos Dice' },
-    { emoji: '👾', name: 'Void Creature' },
+    { emoji: '🚬', name: 'Bubble Cigarette', price: '₹xoxo' },
+    { emoji: '💦', name: 'Water Rocket', price: '₹xoxo' },
+    { emoji: '✏️', name: 'Transformer Pen', price: '₹xoxo' },
+    { emoji: '🐱', name: 'Angry Cat Lamp', price: '₹xoxo' },
+    { emoji: '🍔', name: 'Burger Slippers', price: '₹xoxo' },
+    { emoji: '🧦', name: 'Mismatch Socks', price: '₹xoxo' },
+    { emoji: '🎲', name: 'Chaos Dice', price: '₹xoxo' },
+    { emoji: '👾', name: 'Void Plushie', price: '₹xoxo' },
   ];
 
   useEffect(() => {
@@ -114,17 +136,17 @@ export default function Home() {
 
   // Glitch text
   useEffect(() => {
-    const texts = ["603", "VOID", "ENTER", "???" , "BRUH", "SUS", "LOL", "NAH", "YOOO", "OMG", "WTF", "VIBE", "ZONK", "WOW", "COOL", "SICK", "FIRE", "LIT", "WHO", "WHAT", "WHEN", "WHERE", "WHY", "GAME", "IMPOSSIBLE", "CATCH", "FREE"];
+    const texts = ["603", "VOID", "GIFT", "???" , "BRUH", "SUS", "LOL", "NAH", "YOOO", "OMG", "WTF", "VIBE", "ZONK", "WOW", "COOL", "SICK", "FIRE", "LIT", "WHO", "WHAT", "WHEN", "WHERE", "WHY", "GIFT", "CURATED", "CATCH", "FREE"];
     const interval = setInterval(() => {
       setGlitchText(texts[Math.floor(Math.random() * texts.length)]);
     }, 120);
     return () => clearInterval(interval);
   }, []);
 
-  // SASSY POPUPS
+  // MYSTERIOUS POPUPS
   useEffect(() => {
     const interval = setInterval(() => {
-      setSassyMessage(sassyPopups[Math.floor(Math.random() * sassyPopups.length)]);
+      setSassyMessage(mysteriousPopups[Math.floor(Math.random() * mysteriousPopups.length)]);
       setShowSassy(true);
       setTimeout(() => setShowSassy(false), 3000);
     }, 8000 + Math.random() * 4000);
@@ -153,10 +175,10 @@ export default function Home() {
     return () => clearInterval(interval);
   }, []);
 
-  // FAKE COUNTER ANIMATION
+  // VIEWER COUNTER ANIMATION
   useEffect(() => {
     const interval = setInterval(() => {
-      setFakeCounter(prev => prev + Math.floor(Math.random() * 3) + 1);
+      setViewerCount(prev => prev + Math.floor(Math.random() * 3) + 1);
     }, 5000);
     return () => clearInterval(interval);
   }, []);
@@ -172,8 +194,8 @@ export default function Home() {
         
         if (newCode.length === konamiCode.length && 
             newCode.every((key, i) => key === konamiCode[i])) {
-          setShowEasterEgg(true);
-          setTimeout(() => setShowEasterEgg(false), 5000);
+          setShowSecret(true);
+          setTimeout(() => setShowSecret(false), 5000);
         }
         
         return newCode;
@@ -184,12 +206,12 @@ export default function Home() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  // RANDOM CURSOR MESSAGES
+  // RANDOM CURSOR MESSAGES (desktop only)
   useEffect(() => {
     const messages = ["👀", "don't touch that", "too late", "hehe", "bro?", "sus", "👁️", "💀", "why here?", "no", "yes"];
     
     const interval = setInterval(() => {
-      if (Math.random() > 0.7) {
+      if (Math.random() > 0.7 && window.innerWidth > 768) {
         setCursorMessage(messages[Math.floor(Math.random() * messages.length)]);
         setShowCursorMessage(true);
         setTimeout(() => setShowCursorMessage(false), 2000);
@@ -199,9 +221,9 @@ export default function Home() {
     return () => clearInterval(interval);
   }, []);
 
-  // FLOATING OBJECTS FROM PORTAL
+  // FLOATING OBJECTS FROM PORTAL (on touch/hover)
   useEffect(() => {
-    if (isHoveringPortal) {
+    if (isTouchingPortal) {
       const interval = setInterval(() => {
         const newObject = {
           id: Date.now(),
@@ -219,11 +241,11 @@ export default function Home() {
       
       return () => clearInterval(interval);
     }
-  }, [isHoveringPortal]);
+  }, [isTouchingPortal]);
 
   // Portal power surge
   useEffect(() => {
-    if (isHoveringPortal) {
+    if (isTouchingPortal) {
       const interval = setInterval(() => {
         setPortalPower(Math.random());
       }, 50);
@@ -231,11 +253,11 @@ export default function Home() {
     } else {
       setPortalPower(0);
     }
-  }, [isHoveringPortal]);
+  }, [isTouchingPortal]);
 
   // Logo glitch effect
   useEffect(() => {
-    if (isHoveringLogo) {
+    if (isTouchingLogo) {
       const interval = setInterval(() => {
         setLogoGlitch(true);
         setTimeout(() => setLogoGlitch(false), 80);
@@ -245,11 +267,11 @@ export default function Home() {
         setLogoGlitch(false);
       };
     }
-  }, [isHoveringLogo]);
+  }, [isTouchingLogo]);
 
-  // Game - move logo randomly
+  // Game - move logo randomly (renamed to catch game)
   useEffect(() => {
-    if (gameActive && gameRef.current) {
+    if (catchGameActive && gameRef.current) {
       const moveLogo = () => {
         const container = gameRef.current;
         if (container) {
@@ -264,38 +286,7 @@ export default function Home() {
       const interval = setInterval(moveLogo, 300);
       return () => clearInterval(interval);
     }
-  }, [gameActive]);
-
-  // Countdown
-  const [countdown, setCountdown] = useState({
-    days: '00',
-    hours: '00',
-    minutes: '00',
-    seconds: '00'
-  });
-
-  useEffect(() => {
-    const targetDate = new Date('2026-03-15T00:00:00').getTime();
-    
-    const interval = setInterval(() => {
-      const now = new Date().getTime();
-      const distance = targetDate - now;
-      
-      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-      
-      setCountdown({
-        days: days.toString().padStart(2, '0'),
-        hours: hours.toString().padStart(2, '0'),
-        minutes: minutes.toString().padStart(2, '0'),
-        seconds: seconds.toString().padStart(2, '0')
-      });
-    }, 1000);
-    
-    return () => clearInterval(interval);
-  }, []);
+  }, [catchGameActive]);
 
   // Electric sparks
   const sparks = useMemo(() => 
@@ -310,14 +301,14 @@ export default function Home() {
 
   // Background floating elements
   const floatingChaos = useMemo(() => 
-    Array.from({ length: 80 }, (_, i) => ({
+    Array.from({ length: 60 }, (_, i) => ({
       id: i,
-      char: ['🌀', '⚡', '💫', '✨', '🌟', '🎭', '🧿', '🎪', '🧸', '🪄', '👾', '🤖', '👻', '603', '???', 'SUS', 'LOL', 'WOW', '💀', '👽', '🤡', '🎯', '🎲', '🧩', '🎮', '👾', '🤖', '🎰', '🎪'][i % 30],
-      x: (i * 4.5) % 100,
-      y: (i * 8) % 100,
-      size: 6 + (i % 50),
-      duration: 8 + (i % 30),
-      delay: i * 0.05,
+      char: ['🎁', '✨', '🎀', '🎭', '🧿', '🎪', '🧸', '🪄', '👾', '603', '???', 'GIFT', 'VIBE', '💀', '👽', '🤡', '🎯', '🎲', '🧩'][i % 19],
+      x: (i * 6) % 100,
+      y: (i * 9) % 100,
+      size: 8 + (i % 30),
+      duration: 8 + (i % 20),
+      delay: i * 0.08,
     })), []
   );
 
@@ -336,11 +327,11 @@ export default function Home() {
         body: JSON.stringify({
           access_key: "15460d80-5e69-46b0-a97d-8df8d85ee4d6",
           email: value,
-          subject: "🎉 New Portal Signup - HOUSE OF 603",
+          subject: "🎁 New Portal Discovery - HOUSE OF 603",
           from_name: "HOUSE OF 603",
-          message: `✨ Someone entered the portal!\n\nEmail: ${value}\nPosition: ${position} form`,
+          message: `✨ Someone discovered the portal!\n\nEmail: ${value}\nPosition: ${position} form`,
           replyto: value,
-          autoresponse: `👁️ PORTAL ACCESS CONFIRMED\n\nYou just entered House of 603.\n\nThe internet's weird side opens soon.\n\nStay ready.\n\n⚡ March 15, 2026\n\n– 603 Portal\nhttps://houseof603.com`
+          autoresponse: `🎁 PORTAL DISCOVERED\n\nYou just found House of 603.\n\nThe internet's weirdest gifts are coming soon.\n\nStay mysterious.\n\n⚡ COMING SOON\n\n– 603 Portal\nhttps://houseof603.com`
         })
       });
       
@@ -348,7 +339,6 @@ export default function Home() {
       console.log('✅ Web3Forms response:', data);
       
       if (response.ok) {
-        // Clear the specific input that was submitted
         if (position === 'top') {
           setTopEmail("");
         } else {
@@ -360,7 +350,6 @@ export default function Home() {
       
     } catch (error) {
       console.log('❌ Error:', error);
-      // Still clear and show success for demo
       if (position === 'top') {
         setTopEmail("");
       } else {
@@ -370,26 +359,26 @@ export default function Home() {
     }
   };
 
-  const handleGameClick = () => {
-    setGameScore(prev => prev + 1);
-    if (gameScore >= 4) {
-      setGameMessage("🎉 OKAY YOU'RE INSANE! (WE STILL WON'T GIVE DISCOUNT) 🎉");
-      setGameActive(false);
-      setGameScore(0);
+  const handleCatchClick = () => {
+    setCatchScore(prev => prev + 1);
+    if (catchScore >= 4) {
+      setCatchMessage("🎁 YOU FOUND THE SECRET GIFT! (IT'S A SURPRISE) 🎁");
+      setCatchGameActive(false);
+      setCatchScore(0);
     } else {
-      setGameMessage(`😈 SPOILER: YOU'RE NOT BUILT FOR THIS 💀 (${gameScore + 1}/5)`);
+      setCatchMessage(`✨ KEEP EXPLORING... (${catchScore + 1}/5)`);
     }
   };
 
-  const startGame = () => {
-    setGameActive(true);
-    setGameScore(0);
-    setGameMessage("TRY TO CATCH THE LOGO! GOOD LUCK (YOU'LL NEED IT) 😈");
+  const startCatchGame = () => {
+    setCatchGameActive(true);
+    setCatchScore(0);
+    setCatchMessage("CATCH THE MYSTERY GIFT! GOOD LUCK 😈");
   };
 
-  const handlePortalClick = () => {
-    setPortalClicks(prev => prev + 1);
-    if (portalClicks === 14) {
+  const handlePortalTap = () => {
+    setPortalTaps(prev => prev + 1);
+    if (portalTaps === 14) {
       setSassyMessage("OKAY OKAY WE GET IT YOU'RE EXCITED");
       setShowSassy(true);
       setTimeout(() => setShowSassy(false), 3000);
@@ -402,7 +391,7 @@ export default function Home() {
       className="relative min-h-screen bg-[#FFF7EC] overflow-x-hidden"
     >
       
-      {/* Custom Electric Cursor */}
+      {/* Custom Electric Cursor - Desktop only */}
       <motion.div
         className="fixed w-10 h-10 pointer-events-none z-50 mix-blend-difference hidden md:block"
         style={{
@@ -427,7 +416,7 @@ export default function Home() {
         </AnimatePresence>
       </motion.div>
 
-      {/* SASSY POPUP */}
+      {/* MYSTERIOUS POPUP */}
       <AnimatePresence>
         {showSassy && (
           <motion.div
@@ -455,18 +444,18 @@ export default function Home() {
         ))}
       </div>
 
-      {/* EASTER EGG - KONAMI */}
+      {/* SECRET EASTER EGG */}
       <AnimatePresence>
-        {showEasterEgg && (
+        {showSecret && (
           <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             exit={{ scale: 0 }}
             className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-gradient-to-r from-purple-600 to-lime-500 text-white p-8 rounded-3xl shadow-2xl z-50 text-center"
           >
-            <p className="text-6xl mb-4">🎮</p>
-            <p className="text-2xl font-black mb-2">KONAMI CODE ACTIVATED!</p>
-            <p className="text-sm">You found the secret. We are impressed. (No discount tho)</p>
+            <p className="text-6xl mb-4">🎁</p>
+            <p className="text-2xl font-black mb-2">SECRET GIFT DISCOVERED!</p>
+            <p className="text-sm">You found it. Something special is coming.</p>
           </motion.div>
         )}
       </AnimatePresence>
@@ -545,47 +534,45 @@ export default function Home() {
             </motion.div>
           ))}
 
-          {/* ENTER THE PORTAL */}
+          {/* DISCOVER THE PORTAL - Touch friendly */}
           <motion.div
-            className="relative mb-4 z-20 cursor-pointer"
-            onHoverStart={() => setIsHoveringEnter(true)}
-            onHoverEnd={() => setIsHoveringEnter(false)}
+            className="relative mb-4 z-20 cursor-pointer touch:active:scale-95"
+            onHoverStart={() => setIsTouchingEnter(true)}
+            onHoverEnd={() => setIsTouchingEnter(false)}
+            onTouchStart={() => setIsTouchingEnter(true)}
+            onTouchEnd={() => setIsTouchingEnter(false)}
+            whileTap={{ scale: 0.95 }}
           >
             <motion.h2
-              animate={isHoveringEnter ? {
-                scale: [1, 1.3, 1],
-                rotate: [0, 5, -5, 3, -3, 0],
+              animate={isTouchingEnter ? {
+                scale: [1, 1.2, 1],
+                rotate: [0, 3, -3, 0],
                 color: ['#6B21A5', '#84CC16', '#6B21A5'],
-                textShadow: [
-                  '0 0 10px #C084FC',
-                  '0 0 30px #A7F3D0',
-                  '0 0 50px #C084FC',
-                  '0 0 30px #A7F3D0',
-                  '0 0 10px #C084FC',
-                ]
               } : {
                 scale: 1,
                 rotate: 0,
                 color: '#6B21A5',
-                textShadow: 'none'
               }}
-              transition={{ duration: 0.2 }}
+              transition={{ duration: 0.3 }}
               className="text-2xl md:text-3xl font-black tracking-widest"
             >
               <span className="bg-gradient-to-r from-purple-600 to-lime-500 text-transparent bg-clip-text">
-                ⚡ ENTER THE PORTAL ⚡
+                ⚡ DISCOVER THE PORTAL ⚡
               </span>
             </motion.h2>
           </motion.div>
 
-          {/* Logo */}
+          {/* Logo - Touch friendly */}
           <motion.div
-            className="relative mb-6 md:mb-8 z-20 cursor-pointer"
-            onHoverStart={() => setIsHoveringLogo(true)}
-            onHoverEnd={() => setIsHoveringLogo(false)}
+            className="relative mb-6 md:mb-8 z-20 cursor-pointer touch:active:scale-95"
+            onHoverStart={() => setIsTouchingLogo(true)}
+            onHoverEnd={() => setIsTouchingLogo(false)}
+            onTouchStart={() => setIsTouchingLogo(true)}
+            onTouchEnd={() => setIsTouchingLogo(false)}
+            whileTap={{ scale: 0.95 }}
           >
             <AnimatePresence>
-              {isHoveringLogo && (
+              {isTouchingLogo && (
                 <>
                   {[...Array(16)].map((_, i) => (
                     <motion.div
@@ -643,15 +630,20 @@ export default function Home() {
             </motion.div>
           </motion.div>
 
-          {/* PORTAL */}
+          {/* PORTAL - Touch friendly */}
           <motion.div
-            className="relative cursor-pointer group mb-8 md:mb-10 z-20"
-            onHoverStart={() => setIsHoveringPortal(true)}
-            onHoverEnd={() => setIsHoveringPortal(false)}
-            onClick={handlePortalClick}
+            className="relative cursor-pointer group mb-8 md:mb-10 z-20 touch:active:scale-95"
+            onHoverStart={() => setIsTouchingPortal(true)}
+            onHoverEnd={() => setIsTouchingPortal(false)}
+            onTouchStart={() => {
+              setIsTouchingPortal(true);
+              handlePortalTap();
+            }}
+            onTouchEnd={() => setIsTouchingPortal(false)}
+            whileTap={{ scale: 0.95 }}
           >
             <AnimatePresence>
-              {isHoveringPortal && floatingObjects.map((obj) => (
+              {isTouchingPortal && floatingObjects.map((obj) => (
                 <motion.div
                   key={obj.id}
                   className="absolute text-2xl"
@@ -675,7 +667,7 @@ export default function Home() {
             </AnimatePresence>
 
             <AnimatePresence>
-              {isHoveringPortal && sparks.map((spark) => (
+              {isTouchingPortal && sparks.map((spark) => (
                 <motion.div
                   key={spark.id}
                   className="absolute top-1/2 left-1/2 w-px"
@@ -706,29 +698,27 @@ export default function Home() {
             </AnimatePresence>
 
             <motion.div
-              animate={isHoveringPortal ? {
-                rotate: [0, 20, -20, 30, -30, 20, -20, 0],
-                scale: [1, 1.3, 0.85, 1.4, 0.8, 1.2, 1],
+              animate={isTouchingPortal ? {
+                rotate: [0, 15, -15, 20, -20, 15, -15, 0],
+                scale: [1, 1.2, 0.9, 1.3, 0.85, 1.15, 1],
               } : {
                 rotate: 0,
                 scale: 1
               }}
-              transition={{ duration: 0.2 }}
+              transition={{ duration: 0.3 }}
             >
               <motion.div 
                 className="w-56 h-56 md:w-80 md:h-80 rounded-full relative"
-                animate={isHoveringPortal ? {
+                animate={isTouchingPortal ? {
                   boxShadow: [
                     '0 0 40px #C084FC',
-                    '0 0 100px #A7F3D0',
-                    '0 0 150px #C084FC',
-                    '0 0 100px #A7F3D0',
-                    '0 0 40px #C084FC',
+                    '0 0 80px #A7F3D0',
+                    '0 0 120px #C084FC',
                   ]
                 } : {
                   boxShadow: '0 0 20px #C084FC80'
                 }}
-                transition={{ duration: 0.08 }}
+                transition={{ duration: 0.3 }}
               >
                 {[...Array(7)].map((_, i) => (
                   <motion.div
@@ -738,47 +728,42 @@ export default function Home() {
                       borderColor: i % 2 === 0 ? '#C084FC' : '#A7F3D0',
                       opacity: 0.8 - i * 0.1,
                     }}
-                    animate={isHoveringPortal ? {
+                    animate={isTouchingPortal ? {
                       rotate: [0, 360],
-                      scale: [1, 1.25 - i * 0.03, 1],
-                      borderWidth: [4, 12, 4, 15, 4],
+                      scale: [1, 1.2 - i * 0.02, 1],
+                      borderWidth: [4, 10, 4],
                     } : {
                       rotate: 0,
                       scale: 1,
                       borderWidth: 4
                     }}
                     transition={{
-                      rotate: { duration: 0.8 - i * 0.08, repeat: isHoveringPortal ? Infinity : 0, ease: "linear" },
-                      scale: { duration: 0.1, repeat: isHoveringPortal ? Infinity : 0 },
-                      borderWidth: { duration: 0.06, repeat: isHoveringPortal ? Infinity : 0 },
+                      rotate: { duration: 0.8 - i * 0.08, repeat: isTouchingPortal ? Infinity : 0, ease: "linear" },
+                      scale: { duration: 0.2, repeat: isTouchingPortal ? Infinity : 0 },
                     }}
                   />
                 ))}
 
                 <div className="absolute inset-0 flex items-center justify-center">
                   <motion.div
-                    animate={isHoveringPortal ? {
-                      scale: [1, 3, 1, 2.5, 1, 3.5, 1],
-                      rotate: [0, 720, 0, 360, 0, 720, 0],
-                      backgroundColor: ['#C084FC', '#A7F3D0', '#C084FC', '#A7F3D0', '#C084FC', '#A7F3D0', '#C084FC'],
-                      borderRadius: ["50%", "20%", "50%", "10%", "50%", "25%", "50%"],
+                    animate={isTouchingPortal ? {
+                      scale: [1, 2.5, 1, 2, 1],
+                      rotate: [0, 360, 0, 180, 0],
+                      backgroundColor: ['#C084FC', '#A7F3D0', '#C084FC', '#A7F3D0', '#C084FC'],
                     } : {
                       scale: 1,
                       rotate: 0,
                       backgroundColor: '#C084FC',
-                      borderRadius: "50%"
                     }}
-                    transition={{
-                      duration: 0.15,
-                    }}
-                    className="w-16 h-16 md:w-24 md:h-24 bg-gradient-to-r from-lime-400 to-purple-500"
+                    transition={{ duration: 0.3 }}
+                    className="w-16 h-16 md:w-24 md:h-24 bg-gradient-to-r from-lime-400 to-purple-500 rounded-full"
                   />
                 </div>
 
                 <motion.div
                   className="absolute inset-0 flex items-center justify-center"
-                  animate={isHoveringPortal ? { rotate: 360 } : { rotate: 0 }}
-                  transition={{ duration: 8, repeat: isHoveringPortal ? Infinity : 0, ease: "linear" }}
+                  animate={isTouchingPortal ? { rotate: 360 } : { rotate: 0 }}
+                  transition={{ duration: 8, repeat: isTouchingPortal ? Infinity : 0, ease: "linear" }}
                 >
                   <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-4 text-xs font-bold text-purple-600 whitespace-nowrap">
                     {portalOrbitText}
@@ -788,14 +773,14 @@ export default function Home() {
             </motion.div>
 
             <AnimatePresence>
-              {isHoveringPortal && (
+              {isTouchingPortal && (
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
                   className="absolute -bottom-14 left-1/2 -translate-x-1/2 whitespace-nowrap bg-purple-600 text-white px-5 py-2.5 rounded-full text-sm font-bold shadow-2xl"
                 >
-                  ⚡ {Math.floor(2000 + portalPower * 1000)}% PORTAL ENERGY ⚡
+                  ⚡ {Math.floor(2000 + portalPower * 1000)}% MYSTERY ENERGY ⚡
                 </motion.div>
               )}
             </AnimatePresence>
@@ -806,30 +791,31 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             className="text-3xl md:text-6xl font-black text-purple-600 mb-2 text-center tracking-tighter drop-shadow-lg"
           >
-            THE INTERNET'S WEIRD SIDE
+            COMING SOON
           </motion.h1>
 
-          <p className="text-gray-700 text-sm md:text-base mb-4 font-bold">OPENS MARCH 15, 2026</p>
+          <p className="text-gray-700 text-sm md:text-base mb-4 font-bold">SOMETHING WEIRD IS COMING</p>
 
           <motion.div
             animate={{ scale: [1, 1.05, 1] }}
             transition={{ duration: 2, repeat: Infinity }}
             className="mb-4 text-purple-600 font-bold text-sm bg-purple-100 px-4 py-2 rounded-full"
           >
-            {fakeCounter.toLocaleString()} PEOPLE WAITING
+            {viewerCount.toLocaleString()} CURIOUS SOULS WAITING
           </motion.div>
 
+          {/* ========== CRAZY COUNTER - RANDOM NUMBERS ========== */}
           <div className="flex gap-3 md:gap-5 mb-6 flex-wrap justify-center">
             {[
-              { label: 'DAYS', value: countdown.days },
-              { label: 'HOURS', value: countdown.hours },
-              { label: 'MINS', value: countdown.minutes },
-              { label: 'SECS', value: countdown.seconds }
+              { label: 'DAYS', value: crazyCounter.days },
+              { label: 'HOURS', value: crazyCounter.hours },
+              { label: 'MINS', value: crazyCounter.minutes },
+              { label: 'SECS', value: crazyCounter.seconds }
             ].map((unit, i) => (
               <motion.div
                 key={unit.label}
                 className="text-center"
-                animate={{ y: [0, -6, 0] }}
+                animate={{ y: [0, -8, 0], rotate: [0, i % 2 === 0 ? 2 : -2, 0] }}
                 transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.1 }}
               >
                 <div className="bg-purple-600 w-14 h-14 md:w-20 md:h-20 rounded-xl flex items-center justify-center shadow-2xl">
@@ -843,7 +829,6 @@ export default function Home() {
           {/* ========== TOP EMAIL FORM ONLY ========== */}
           <div className="w-full max-w-md mb-3">
             <PortalForm
-              type="email"
               position="top"
               value={topEmail}
               onChange={setTopEmail}
@@ -877,10 +862,12 @@ export default function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.1 }}
                 whileHover={{ scale: 1.1, rotate: idx % 2 === 0 ? 5 : -5 }}
-                className="bg-white p-6 rounded-2xl shadow-xl text-center hover:shadow-2xl transition-all"
+                whileTap={{ scale: 0.95 }}
+                className="bg-white p-6 rounded-2xl shadow-xl text-center hover:shadow-2xl transition-all cursor-pointer"
               >
                 <div className="text-5xl mb-3">{obj.emoji}</div>
                 <h3 className="text-sm font-bold text-purple-600">{obj.name}</h3>
+                <p className="text-xs text-purple-400 font-semibold mt-1">{obj.price}</p>
                 <p className="text-xs text-gray-500 mt-1">coming soon</p>
               </motion.div>
             ))}
@@ -903,7 +890,9 @@ export default function Home() {
               initial={{ opacity: 0, x: -60 }}
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.1, type: "spring" }}
-              className="bg-gradient-to-r from-white to-purple-50 p-6 rounded-2xl shadow-xl border-l-8 border-lime-400 hover:shadow-2xl transition-all hover:scale-105"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="bg-gradient-to-r from-white to-purple-50 p-6 rounded-2xl shadow-xl border-l-8 border-lime-400 hover:shadow-2xl transition-all cursor-pointer"
             >
               <p className="text-lg md:text-xl font-bold text-gray-800">🎂 ALL STARTED WITH A BIRTHDAY.</p>
             </motion.div>
@@ -912,7 +901,9 @@ export default function Home() {
               initial={{ opacity: 0, x: 60 }}
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.2, type: "spring" }}
-              className="bg-gradient-to-l from-white to-purple-50 p-6 rounded-2xl shadow-xl border-r-8 border-purple-400 hover:shadow-2xl transition-all hover:scale-105 text-right"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="bg-gradient-to-l from-white to-purple-50 p-6 rounded-2xl shadow-xl border-r-8 border-purple-400 hover:shadow-2xl transition-all cursor-pointer text-right"
             >
               <p className="text-lg md:text-xl font-bold text-gray-800">KEPT ASKING FOR GIFT CHOICES. 🤷‍♂️</p>
             </motion.div>
@@ -921,16 +912,20 @@ export default function Home() {
               initial={{ opacity: 0, x: -60 }}
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.3, type: "spring" }}
-              className="bg-gradient-to-r from-white to-purple-50 p-6 rounded-2xl shadow-xl border-l-8 border-lime-400 hover:shadow-2xl transition-all hover:scale-105"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="bg-gradient-to-r from-white to-purple-50 p-6 rounded-2xl shadow-xl border-l-8 border-lime-400 hover:shadow-2xl transition-all cursor-pointer"
             >
-              <p className="text-lg md:text-xl font-bold text-gray-800">🎭 GOT SENT REELS SARCASTICALLY - PRODUCTS NOT FOUND IN INDIA.</p>
+              <p className="text-lg md:text-xl font-bold text-gray-800">🎭 GOT SENT REELS OF PRODUCTS NOT FOUND IN INDIA.</p>
             </motion.div>
 
             <motion.div
               initial={{ opacity: 0, x: 60 }}
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.4, type: "spring" }}
-              className="bg-gradient-to-l from-white to-purple-50 p-6 rounded-2xl shadow-xl border-r-8 border-purple-400 hover:shadow-2xl transition-all hover:scale-105 text-right"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="bg-gradient-to-l from-white to-purple-50 p-6 rounded-2xl shadow-xl border-r-8 border-purple-400 hover:shadow-2xl transition-all cursor-pointer text-right"
             >
               <p className="text-lg md:text-xl font-bold text-gray-800">🔍 SEARCHED ALL AROUND. FOUND NOTHING.</p>
             </motion.div>
@@ -939,7 +934,9 @@ export default function Home() {
               initial={{ opacity: 0, x: -60 }}
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.5, type: "spring" }}
-              className="bg-gradient-to-r from-white to-purple-50 p-6 rounded-2xl shadow-xl border-l-8 border-lime-400 hover:shadow-2xl transition-all hover:scale-105"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="bg-gradient-to-r from-white to-purple-50 p-6 rounded-2xl shadow-xl border-l-8 border-lime-400 hover:shadow-2xl transition-all cursor-pointer"
             >
               <p className="text-lg md:text-xl font-bold text-gray-800">🏠 AND THAT'S HOW HOUSE OF 603 WAS BORN.</p>
             </motion.div>
@@ -949,7 +946,9 @@ export default function Home() {
             initial={{ scale: 0.9, opacity: 0 }}
             whileInView={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.6 }}
-            className="text-center mt-12 p-8 bg-gradient-to-r from-purple-600 to-lime-500 rounded-3xl text-white mx-auto max-w-sm shadow-2xl"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="text-center mt-12 p-8 bg-gradient-to-r from-purple-600 to-lime-500 rounded-3xl text-white mx-auto max-w-sm shadow-2xl cursor-pointer"
           >
             <p className="text-xs mb-3 font-bold tracking-wider opacity-90">🎂 THE BIRTHDAY WAS</p>
             <p className="text-sm mb-2 font-bold tracking-[0.3em]">06 • 03</p>
@@ -979,11 +978,14 @@ export default function Home() {
               initial={{ opacity: 0, x: -50 }}
               whileInView={{ opacity: 1, x: 0 }}
               className="relative cursor-pointer group flex justify-center"
-              onHoverStart={() => setIsHoveringLogo(true)}
-              onHoverEnd={() => setIsHoveringLogo(false)}
+              onHoverStart={() => setIsTouchingLogo(true)}
+              onHoverEnd={() => setIsTouchingLogo(false)}
+              onTouchStart={() => setIsTouchingLogo(true)}
+              onTouchEnd={() => setIsTouchingLogo(false)}
+              whileTap={{ scale: 0.95 }}
             >
               <AnimatePresence>
-                {isHoveringLogo && (
+                {isTouchingLogo && (
                   <>
                     {[...Array(20)].map((_, i) => (
                       <motion.div
@@ -1012,7 +1014,7 @@ export default function Home() {
               </AnimatePresence>
 
               <motion.div
-                animate={isHoveringLogo ? {
+                animate={logoGlitch ? {
                   rotateY: [0, 720],
                   scale: [1, 1.4, 1],
                   filter: [
@@ -1044,7 +1046,7 @@ export default function Home() {
               className="space-y-6"
             >
               <motion.div
-                animate={isHoveringLogo ? { 
+                animate={isTouchingLogo ? { 
                   scale: [1, 1.15, 1],
                   color: ['#6B21A5', '#84CC16', '#6B21A5'],
                 } : {
@@ -1058,7 +1060,7 @@ export default function Home() {
               </motion.div>
 
               <motion.div
-                animate={isHoveringLogo ? { 
+                animate={isTouchingLogo ? { 
                   x: [0, 10, -10, 5, -5, 0],
                 } : {
                   x: 0
@@ -1076,7 +1078,8 @@ export default function Home() {
 
               <motion.div
                 whileHover={{ scale: 1.1, rotate: 2 }}
-                className="inline-block bg-purple-600 text-white px-6 py-3 rounded-full font-bold text-sm shadow-xl"
+                whileTap={{ scale: 0.95 }}
+                className="inline-block bg-purple-600 text-white px-6 py-3 rounded-full font-bold text-sm shadow-xl cursor-pointer"
               >
                 🚀 NO MIDDLEMEN. JUST WEIRD.
               </motion.div>
@@ -1084,7 +1087,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ================= IMPOSSIBLE GAME ================= */}
+        {/* ================= MYSTERY CATCH GAME ================= */}
         <section className="w-full max-w-4xl mx-auto px-4 py-20 md:py-28">
           
           <motion.h2
@@ -1092,10 +1095,10 @@ export default function Home() {
             whileInView={{ opacity: 1 }}
             className="text-3xl md:text-5xl font-black text-purple-600 mb-4 text-center tracking-tighter"
           >
-            IMPOSSIBLE GAME
+            MYSTERY CATCH
           </motion.h2>
 
-          <p className="text-center text-gray-600 mb-8 font-medium">CATCH THE LOGO. WIN 100% OFF. (SPOILER: YOU'RE NOT BUILT FOR THIS 💀)</p>
+          <p className="text-center text-gray-600 mb-8 font-medium">CATCH THE GIFT. WIN A SURPRISE. (SPOILER: IT'S IMPOSSIBLE 💀)</p>
 
           <motion.div
             ref={gameRef}
@@ -1109,18 +1112,18 @@ export default function Home() {
               backgroundSize: '30px 30px',
             }} />
 
-            {!gameActive ? (
+            {!catchGameActive ? (
               <div className="absolute inset-0 flex flex-col items-center justify-center">
                 <motion.button
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.95 }}
-                  onClick={startGame}
+                  onClick={startCatchGame}
                   className="bg-purple-600 text-white px-8 py-4 rounded-2xl text-xl font-bold shadow-2xl hover:bg-purple-700 transition-all"
                 >
-                  🎮 START GAME 🎮
+                  🎁 CATCH THE GIFT 🎁
                 </motion.button>
-                {gameMessage && (
-                  <p className="mt-4 text-purple-600 font-bold text-sm">{gameMessage}</p>
+                {catchMessage && (
+                  <p className="mt-4 text-purple-600 font-bold text-sm">{catchMessage}</p>
                 )}
               </div>
             ) : (
@@ -1139,31 +1142,29 @@ export default function Home() {
                     duration: 0.3,
                     repeat: Infinity,
                   }}
-                  onClick={handleGameClick}
+                  onClick={handleCatchClick}
+                  onTouchStart={handleCatchClick}
                   whileHover={{ scale: 1.3 }}
+                  whileTap={{ scale: 0.9 }}
                 >
                   <div className="relative">
                     <div className="absolute inset-0 bg-purple-600 blur-xl opacity-50" />
-                    <Image
-                      src="/logo.png"
-                      alt="Catch me!"
-                      width={80}
-                      height={40}
-                      className="w-16 md:w-20 h-auto relative z-10"
-                    />
+                    <div className="w-16 md:w-20 h-16 md:h-20 bg-gradient-to-r from-purple-600 to-lime-500 rounded-2xl flex items-center justify-center text-3xl relative z-10">
+                      🎁
+                    </div>
                   </div>
                 </motion.div>
 
                 <div className="absolute bottom-4 left-0 right-0 text-center">
                   <p className="text-purple-600 font-bold text-sm bg-white/80 inline-block px-4 py-2 rounded-full">
-                    {gameMessage}
+                    {catchMessage}
                   </p>
                 </div>
               </>
             )}
           </motion.div>
 
-          <p className="text-center text-xs text-gray-500 mt-4">*The discount doesn't exist. We lied. But the game is fun. IF YOU WIN WE'LL PANIC.</p>
+          <p className="text-center text-xs text-gray-500 mt-4">*The gift doesn't exist. We lied. But the game is fun. IF YOU WIN WE'LL PANIC.</p>
         </section>
 
         {/* ================= DON'T MISS OUT ================= */}
@@ -1171,11 +1172,14 @@ export default function Home() {
           
           <motion.div
             className="relative cursor-pointer group mb-6"
-            onHoverStart={() => setIsHoveringPortal(true)}
-            onHoverEnd={() => setIsHoveringPortal(false)}
+            onHoverStart={() => setIsTouchingPortal(true)}
+            onHoverEnd={() => setIsTouchingPortal(false)}
+            onTouchStart={() => setIsTouchingPortal(true)}
+            onTouchEnd={() => setIsTouchingPortal(false)}
+            whileTap={{ scale: 0.95 }}
           >
             <motion.div
-              animate={isHoveringPortal ? { rotate: [0, 25, -25, 0], scale: [1, 1.4, 0.7, 1] } : { rotate: 0, scale: 1 }}
+              animate={isTouchingPortal ? { rotate: [0, 25, -25, 0], scale: [1, 1.4, 0.7, 1] } : { rotate: 0, scale: 1 }}
               transition={{ duration: 0.25 }}
             >
               <div className="w-20 h-20 md:w-24 md:h-24 rounded-full relative">
@@ -1184,7 +1188,7 @@ export default function Home() {
                 <div className="absolute inset-2 rounded-full border border-purple-300" />
                 <div className="absolute inset-0 flex items-center justify-center">
                   <motion.div
-                    animate={isHoveringPortal ? { 
+                    animate={isTouchingPortal ? { 
                       scale: [1, 2.2, 1], 
                       backgroundColor: ['#C084FC', '#A7F3D0', '#C084FC'],
                       rotate: [0, 360],
@@ -1216,14 +1220,13 @@ export default function Home() {
           {/* ========== BOTTOM EMAIL FORM ONLY ========== */}
           <div className="w-full max-w-md">
             <PortalForm
-              type="email" 
               position="bottom"
               value={bottomEmail}
               onChange={setBottomEmail}
               onSubmit={handleEmailSubmit}
-              placeholder="slide into the portal"
+              placeholder="Enter your email"
               icon="📧"
-              buttonText="LET ME IN"
+              buttonText="JOIN WAITLIST"
             />
           </div>
 
@@ -1233,7 +1236,7 @@ export default function Home() {
             transition={{ duration: 2, repeat: Infinity }}
           >
             <span className="text-lg">⚡</span>
-            <span>HOUSE OF 603 • WHERE WEIRD LIVES</span>
+            <span>HOUSE OF 603 • CURATED CHAOS</span>
             <span className="text-lg">⚡</span>
           </motion.div>
         </section>
