@@ -829,6 +829,7 @@ export default function Home() {
           {/* ========== TOP EMAIL FORM ONLY ========== */}
           <div className="w-full max-w-md mb-3">
             <PortalForm
+            
               position="top"
               value={topEmail}
               onChange={setTopEmail}
